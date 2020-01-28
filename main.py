@@ -15,7 +15,7 @@ preview_text = ""
 for i in range(height):
 	for j in range(width):
 		preview_text += "#"
-	preview_text += "\n"	
+	preview_text += "\n"
 
 # get a font
 fnt = ImageFont.truetype('fira_code.ttf', size)
@@ -35,7 +35,7 @@ def calculateScoreForText(evaluable_text):
 #		for j in range(height):
 #			score += difference.getpixel((i,j))[0]
 	return score
-	
+
 
 # draw text, half opacit
 d.text((0,0), preview_text, font=fnt, fill=(0,0,0,255))
@@ -50,14 +50,14 @@ log.printLogNormal("Showing preview image")
 out.show()
 log.printLogNormal("Score of preview text is " + str(calculateScoreForText(preview_text)))
 
-dictionary = " ABCDEFGHIJLKMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890~\{}[]()./-><|!@$#%^&*'_"
+dictionary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;?@[\\]^_`{|}~ "
 
 text_commited = ""
 
 for i in range(height):
 	for j in range(width):
 		lowest_score = 9999999999999999999999999999999
-		best_char = ""		
+		best_char = ""
 		for character in dictionary:
 			this_score = calculateScoreForText(text_commited + character)
 			if this_score < lowest_score:
@@ -68,5 +68,5 @@ for i in range(height):
 	text_commited += "\n"
 	print(text_commited)
 	log.printLogNormal("Finished line " + str(i))
-	
+
 log.popOrigin()
