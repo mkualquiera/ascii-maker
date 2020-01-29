@@ -7,12 +7,10 @@ from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageStat, ImageOps
 
 import log
 
-inverted = True
-
 args = sys.argv[1:]
 # get the image
 if len(args) >= 1:
-	base = Image.open(args[0]).convert('L')
+	base = Image.open(args[-1]).convert('L')
 else:
 	sys.exit()
 
@@ -21,12 +19,43 @@ font_size = 16
 cell_width = 9.1
 cell_height = 19
 
+# base dimensions in pixels
+base_w, base_h = base.size
+
+# base dimensions in cells
+width = math.floor(base_w / cell_width)
+height = math.floor(base_h / cell_height)
+
+# target dimension in cells
+target_cw = width
+
+# invert image ?
+inverted = False
+
+for a in args[:-1]:
+	# print(a)
+	if a == "--invert":
+		inverted = True
+	elif a.startswith("--width="):
+		segs = a.split("=", 1)
+		target_cw = int(segs[1])
+	# elif a.startswith("--height="):
+	# 	segs = a.split("=", 1)
+	# 	target_ch = int(segs[1])
 
 if inverted:
 	base = ImageOps.invert(base)
 
-width = math.floor(base_w / cell_width)
-height = math.floor(base_h / cell_height)
+# scale image
+target_pw = target_cw*cell_width
+wpercent = (target_pw/float(base.size[0]))
+target_ph = int((float(base.size[1])*float(wpercent)))
+base = base.resize((int(target_pw), int(target_ph)), Image.ANTIALIAS)
+
+# base dimensions in cells
+width = math.floor(target_pw / cell_width)
+height = math.floor(target_ph / cell_height)
+
 # get a font
 fnt = ImageFont.truetype('fira_code.ttf', font_size)
 
