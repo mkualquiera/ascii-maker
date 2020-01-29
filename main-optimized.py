@@ -42,8 +42,6 @@ def calculateScoreForText(evaluable_text, i, j):
 	y = i * y_offset
 	if cached_image == None:
 		cached_image = base.crop((x, y, x+30, y+30))
-	temporal_image = Image.new('RGB', base.size, (255,255,255))
-	temporal_image.paste(images[evaluable_text], (int(x),int(y)))
 	difference = ImageChops.difference(cached_image, images[evaluable_text])
 	score = 0
 	stat = ImageStat.Stat(difference)
