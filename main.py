@@ -1,72 +1,72 @@
-from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageStat
-# get an image
-base = Image.open('input.jpg').convert('RGBA')
+import string
+import sys
+import math
+import os
+
+from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageStat, ImageOps
+
 import log
 
-size=20
-width=40
-height=22
+inverted = True
+
+args = sys.argv[1:]
+# get the image
+if len(args) >= 1:
+	base = Image.open(args[0]).convert('L')
+else:
+	sys.exit()
+
+base_w, base_h = base.size
+font_size = 16
+cell_width = 9.1
+cell_height = 19
 
 
-# make a blank image for the text, initialized to transparent text color
-preview_image = Image.new('RGBA', base.size, (255,255,255,0))
+if inverted:
+	base = ImageOps.invert(base)
 
-preview_text = ""
-for i in range(height):
-	for j in range(width):
-		preview_text += "#"
-	preview_text += "\n"
-
+width = math.floor(base_w / cell_width)
+height = math.floor(base_h / cell_height)
 # get a font
-fnt = ImageFont.truetype('fira_code.ttf', size)
-# get a drawing context
-d = ImageDraw.Draw(preview_image)
-
-def calculateScoreForText(evaluable_text):
-	temporal_image = Image.new('RGBA', base.size, (255,255,255,255))
-	draw_context = ImageDraw.Draw(temporal_image)
-	draw_context.text((0,0), evaluable_text, font=fnt, fill=(0,0,0,255))
-	difference = ImageChops.difference(base.convert('RGB'), temporal_image.convert('RGB'))
-	width, height = difference.size
-	score = 0
-	stat = ImageStat.Stat(difference)
-	score = stat.sum[0]
-#	for i in range(width):
-#		for j in range(height):
-#			score += difference.getpixel((i,j))[0]
-	return score
-
-
-# draw text, half opacit
-d.text((0,0), preview_text, font=fnt, fill=(0,0,0,255))
-
-changed_image = Image.alpha_composite(base, preview_image)
-
-out = ImageChops.difference(base.convert('RGB'), changed_image.convert('RGB'))
+fnt = ImageFont.truetype('fira_code.ttf', font_size)
 
 log.pushOrigin("Ascii Maker")
 
-log.printLogNormal("Showing preview image")
-out.show()
-log.printLogNormal("Score of preview text is " + str(calculateScoreForText(preview_text)))
+dictionary = " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;?@[\\]^_`{|}~<=>"
 
-dictionary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;?@[\\]^_`{|}~ "
+images = {}
+log.printLogNormal("Rendering stamps")
+for character in dictionary:
+	new_image = Image.new('L', (int(cell_width), int(cell_height)), (255))
+	new_draw = ImageDraw.Draw(new_image)
+	new_draw.text((0,0), character, font=fnt, fill=(0))
+	images[character] = new_image
 
-text_commited = ""
 
-for i in range(height):
-	for j in range(width):
-		lowest_score = 9999999999999999999999999999999
-		best_char = ""
-		for character in dictionary:
-			this_score = calculateScoreForText(text_commited + character)
-			if this_score < lowest_score:
-				best_char = character
-				lowest_score = this_score
-		text_commited += best_char
-		log.printLogNormal("Finished row " + str(j))
-	text_commited += "\n"
-	print(text_commited)
-	log.printLogNormal("Finished line " + str(i))
+def best_character_at(x, y):
+	best_score = sys.maxsize
+	best_char = " "
+	xx = x * cell_width
+	yy = y * cell_height
+	reference = base.crop((xx, yy, xx+cell_width, yy+cell_height))
+
+	for c in dictionary:
+		difference = ImageChops.difference(reference, images[c])
+		stat = ImageStat.Stat(difference)
+		score = stat.sum[0]
+		if score < best_score:
+			best_score = score
+			best_char = c
+			if score == 0:
+				return best_char
+
+	return best_char
+
+
+log.printLogNormal("Rendering image")
+for y in range(height):
+	for x in range(width):
+		sys.stdout.write(best_character_at(x, y))
+	sys.stdout.write("\n")
 
 log.popOrigin()
