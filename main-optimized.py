@@ -22,7 +22,6 @@ fnt = ImageFont.truetype('fira_code.ttf', size)
 # get a drawing context
 
 
-
 log.pushOrigin("Ascii Maker")
 
 dictionary = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;?@[\\]^_`{|}~ "
@@ -35,19 +34,20 @@ for character in dictionary:
 	new_draw.text((0,0), character, font=fnt, fill=(0,0,0))
 	images[character] = new_image
 
+cached_image = None
+
 def calculateScoreForText(evaluable_text, i, j):
-	temporal_image = Image.new('RGB', base.size, (255,255,255))
+	global cached_image
 	x = j * x_offset
 	y = i * y_offset
+	if cached_image == None:
+		cached_image = base.crop((x, y, x+30, y+30))
+	temporal_image = Image.new('RGB', base.size, (255,255,255))
 	temporal_image.paste(images[evaluable_text], (int(x),int(y)))
-	difference = ImageChops.difference(base, temporal_image)
-	width, height = difference.size
+	difference = ImageChops.difference(cached_image, images[evaluable_text])
 	score = 0
 	stat = ImageStat.Stat(difference)
 	score = stat.sum[0]
-#	for i in range(width):
-#		for j in range(height):
-#			score += difference.getpixel((i,j))[0]
 	return score
 
 text_commited = ""
@@ -56,13 +56,14 @@ for i in range(height):
 	for j in range(width):
 		lowest_score = 9999999999999999999999999999999
 		best_char = ""
+		if cached_image:
+			cached_image = None
 		for character in dictionary:
 			this_score = calculateScoreForText(character, i, j)
 			if this_score < lowest_score:
 				best_char = character
 				lowest_score = this_score
 		text_commited += best_char
-		log.printLogNormal("Finished row " + str(j))
 	text_commited += "\n"
 	print(text_commited)
 	log.printLogNormal("Finished line " + str(i))
