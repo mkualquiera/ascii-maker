@@ -3,12 +3,13 @@ import sys
 import math
 import os
 
-from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageStat
+from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageStat, ImageOps
 
 import log
 
-args = sys.argv[1:]
+inverted = True
 
+args = sys.argv[1:]
 # get the image
 if len(args) >= 1:
 	base = Image.open(args[0]).convert('RGB')
@@ -20,6 +21,10 @@ font_size = 16
 cell_width = 8
 cell_height = 16
 
+
+if inverted:
+	base = ImageOps.invert(base)
+
 width = math.floor(base_w / cell_width)
 height = math.floor(base_h / cell_height)
 # get a font
@@ -27,10 +32,7 @@ fnt = ImageFont.truetype('fira_code.ttf', font_size)
 
 log.pushOrigin("Ascii Maker")
 
-dictionary = string.printable
-for c in string.whitespace:
-	dictionary.replace(c, "")
-dictionary += " "
+dictionary = " 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;?@[\\]^_`{|}~<=>"
 
 images = {}
 log.printLogNormal("Rendering stamps")
@@ -55,6 +57,8 @@ def best_character_at(x, y):
 		if score < best_score:
 			best_score = score
 			best_char = c
+			if score == 0:
+				return best_char
 
 	return best_char
 
