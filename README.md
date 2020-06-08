@@ -1,6 +1,6 @@
 # ascii-maker
 
-Yet another (slow) image to ascii art converter.
+Image to ascii art converter.
 
 ```
 
@@ -21,39 +21,32 @@ Yet another (slow) image to ascii art converter.
 We made this thing because most ascii art tools are really mediocre: they focus too much on larger output texts, as opposed to small ones. That makes it so that you can't really use them for small logos in the terminal and things like that.
 Also, some ascii tools only care about the darkness and brightness, and not so much about the shape, whereas this tool also consider the shape of the characters in relationship to the original shape.
 
-The downside is that this tool can be a bit slower, taking around 10 seconds (depending on cpu) to render a 60 cells square image.
-
 # How to use
 
-First, clone the repo and install the required dependencies using pip:
+Clone the repo and run:
 
 ```
-pip install pillow termcolor
+./build release
 ```
 
 Now, run the tool like this:
 
 ```
-python main.py [image path]
+./bin/asciimaker
 ```
 
-You can increase or decrease the size in cells by doing:
+All options (run ``./bin/asciimaker --help``) are:
 
 ```
-python main.py --width=[cells] [image path]
+  -b, --background           Also change background of the text
+  -c, --color                Use colors
+  -d, --defaults             Treat black and white as the default background
+                             and foreground colors
+  -g, --grasycale            Use grayscale
+  -i, --input=FILE           Input image FILE
+  -o, --output[=FILE]        Output to FILE instead of standard output
+  -w, --width=WIDTH          Change the width in characters of the final image
+  -?, --help                 Give this help list
+      --usage                Give a short usage message
+  -V, --version              Print program version
 ```
-
-By default, dark pixels in the image will turn into text, and white pixels will turn into empty space. If you want it to do the opposite thing, you can do:
-
-```
-python main.py --invert [image path]
-```
-
-You can also combine options like this:
-
-```
-python main.py --invert --width=30 cool_logo.png
-```
-
-# Demo
-For a demo, refer to the (reddit post)[https://www.reddit.com/r/unixporn/comments/fbvk98/oc_create_ascii_art_from_images/].
