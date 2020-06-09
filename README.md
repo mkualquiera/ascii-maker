@@ -23,19 +23,9 @@ Also, some ascii tools only care about the darkness and brightness, and not so m
 
 # How to use
 
-Clone the repo and run:
+Get the latest [release](https://github.com/1Macho/ascii-maker/releases)
 
-```
-./build release
-```
-
-Now, run the tool like this:
-
-```
-./bin/asciimaker
-```
-
-All options (run ``./bin/asciimaker --help``) are:
+Available options (run ``./bin/asciimaker --help``) are:
 
 ```
   -b, --background           Also change background of the text
@@ -49,4 +39,12 @@ All options (run ``./bin/asciimaker --help``) are:
   -?, --help                 Give this help list
       --usage                Give a short usage message
   -V, --version              Print program version
+```
+
+# How to build
+
+Clone the repo and
+
+```
+./build release
 ```
