@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include "util.h"
 #include <stdlib.h>
-#define cell_w 5
-#define cell_h 11
+#define cell_w 10
+#define cell_h 20
 
 #endif
 
@@ -14,7 +14,6 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize.h"
 #include "stamps.h"
-#include "colors.h"
 
 #include "ascii.h"
 
@@ -92,9 +91,11 @@ void ascii_convert(unsigned int fd, unsigned char use_color,
 
   unsigned char *stamps_data = stamps;
   //char *stamps_data = malloc(sizeof(unsigned char) * cell_w * cell_h * 3 * 16 * 16 * 95);
-  long s_char_selector = sizeof(unsigned char) * cell_w * cell_h;
-  long s_row_selector = sizeof(unsigned char) * cell_w;
-  long s_col_selector = sizeof(unsigned char);
+  long s_char_selector = sizeof(unsigned char) * cell_w * cell_h * 3 * 16 * 16;
+  long s_bg_selector = sizeof(unsigned char) * cell_w * cell_h * 3 * 16;
+  long s_fg_selector = sizeof(unsigned char) * cell_w * cell_h * 3;
+  long s_row_selector = sizeof(unsigned char) * cell_w * 3;
+  long s_col_selector = sizeof(unsigned char) * 3;
 
   //printf("Loading stamps...\n");
   /*DIR *d;
@@ -178,28 +179,14 @@ void ascii_convert(unsigned int fd, unsigned char use_color,
             unsigned long long error = 0;
             for (unsigned int ix = 0; ix < cell_w; ix++) {
               for (unsigned int iy = 0; iy < cell_h; iy++) {
-                unsigned char *a = stamps_data+
-                  s_char_selector*char_id+
-                  iy*s_row_selector+
-                  ix*s_col_selector;
+                unsigned char *a = stamps_data+s_char_selector*char_id+s_bg_selector*bg_id+s_fg_selector*fg_id+iy*s_row_selector+ix*s_col_selector;
                 int internal_x = fx * cell_w + ix;
                 int internal_y = fy * cell_h + iy;
-                unsigned char *b = resized_image+
-                  final_iwidth*3*sizeof(char)*internal_y+
-                  3*sizeof(char)*internal_x;
+                unsigned char *b = resized_image+final_iwidth*3*sizeof(char)*internal_y+3*sizeof(char)*internal_x;
                 //printf("%u\n", ((int)a[0]-(int)b[0])*((int)a[0]-(int)b[0]));
-                long long ar = 0;
-                long long ag = 0;
-                long long ab = 0;
-                if (*a) {
-                  ar = colors[3*fg_id+0];
-                  ag = colors[3*fg_id+1];
-                  ab = colors[3*fg_id+2];
-                } else {
-                  ar = colors[3*bg_id+0];
-                  ag = colors[3*bg_id+1];
-                  ab = colors[3*bg_id+2];
-                }
+                long long ar = a[0];
+                long long ag = a[1];
+                long long ab = a[2];
                 long long br = b[0];
                 long long bg = b[1];
                 long long bb = b[2];
