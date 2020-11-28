@@ -18,7 +18,7 @@ const char *argp_program_bug_address = "ozjuanpa@gmail.com";
 static char doc[] = "Ascii maker -- A tool that converts image to ascii art";
 
 static struct argp_option options[] = {
-  {"output", 'o', "FILE", OPTION_ARG_OPTIONAL, "Output to FILE instead of standard output"},
+  {"output", 'o', "FILE", 0, "Output to FILE instead of standard output"},
   {"input", 'i', "FILE", 0, "Input image FILE"},
   {"color", 'c', 0, OPTION_ARG_OPTIONAL, "Use colors"},
   {"grasycale", 'g', 0, OPTION_ARG_OPTIONAL, "Use grayscale"},
@@ -54,7 +54,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
   switch (key)
     {
     case 'o':
-      arguments->set_input = 1;
+      arguments->set_output =1;
       arguments->output_file = arg;
       break;
     case 'i':
@@ -125,11 +125,13 @@ int main(int argc, char *argv[]) {
 
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-  int fd = arguments.set_output ? open(arguments.output_file, O_RDONLY) : STDOUT_FILENO;
+  int fd = arguments.set_output ? open(arguments.output_file, O_WRONLY | O_CREAT, 0644) : STDOUT_FILENO;
 
   ascii_convert(fd, arguments.use_color, arguments.use_background,
     arguments.set_width, arguments.width, arguments.explicit,
     arguments.input_file, arguments.use_grayscale);
+
+  close(fd);
 
   exit(0);
 }

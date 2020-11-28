@@ -83,66 +83,16 @@ void ascii_convert(unsigned int fd, unsigned char use_color,
   int final_iheight = (double)y*rel;
   int final_cheight = final_iheight/cell_h;
 
-  //printf("%u %u %u %u %u %u\n", x, y, final_iwidth, final_iheight, final_cwidth, final_cheight);
-
 
   unsigned char *resized_image = malloc(sizeof(char) * 3 * final_iwidth * final_iheight); 
   stbir_resize_uint8(initial_image, x, y, 0, resized_image, final_iwidth, final_iheight, 0, 3);
 
   unsigned char *stamps_data = stamps;
-  //char *stamps_data = malloc(sizeof(unsigned char) * cell_w * cell_h * 3 * 16 * 16 * 95);
   long s_char_selector = sizeof(unsigned char) * cell_w * cell_h * 3 * 16 * 16;
   long s_bg_selector = sizeof(unsigned char) * cell_w * cell_h * 3 * 16;
   long s_fg_selector = sizeof(unsigned char) * cell_w * cell_h * 3;
   long s_row_selector = sizeof(unsigned char) * cell_w * 3;
   long s_col_selector = sizeof(unsigned char) * 3;
-
-  //printf("Loading stamps...\n");
-  /*DIR *d;
-  struct dirent *dir;
-  d = opendir("./stamps");
-  if (d) {
-    while ((dir = readdir(d)) != NULL) {
-      if (strlen(dir->d_name) > 5) {
-        char char_id[4];
-        char bg_id[3];
-        char fg_id[3];
-        for (int i = 0; i < 3; i++) {
-          char_id[i] = dir->d_name[i];
-        }
-        char_id[3] = '\0';
-        for (int i = 0; i < 2; i++) {
-          bg_id[i] = dir->d_name[i+4];
-        }
-        bg_id[2] = '\0';
-        for (int i = 0; i < 2; i++) {
-          fg_id[i] = dir->d_name[i+7];
-        }
-        fg_id[2] = '\0';
-
-        int char_id_num;
-        int bg_id_num;
-        int fg_id_num;
-        str2int(&char_id_num, char_id, 10);
-        str2int(&bg_id_num, bg_id, 10);
-        str2int(&fg_id_num, fg_id, 10);
-        char_id_num-=32;
-        int w, h, _;
-        char fname[100];
-        strcpy(fname, "./stamps/");
-        strcat(fname,dir->d_name);
-        unsigned char *stamp_image = stbi_load(fname, &w, &h, &_, 3);
-        memcpy(stamps_data+s_char_selector*char_id_num+s_bg_selector*bg_id_num+s_fg_selector*fg_id_num,stamp_image,cell_h*cell_w*3);
-      }
-    }
-    closedir(d);
-  }*/
-  //printf("Done loading stamps...\n");
-  /*for (unsigned long long i = 0; i < sizeof(unsigned char) * cell_w * cell_h * 3 * 16 * 16 * 95; i += sizeof(char)) {
-    printf("%u,",(unsigned char)(stamps_data[i]));
-  }
-  printf("\n");
-  return;*/
 
   for (unsigned int fy = 0; fy < final_cheight; fy++) {
     for (unsigned int fx = 0; fx < final_cwidth; fx++) {
@@ -224,5 +174,6 @@ void ascii_convert(unsigned int fd, unsigned char use_color,
     char nl = '\n';
     write(fd, &nl, 1);
   }
-
+  free(initial_image);
+  free(resized_image);
 }
