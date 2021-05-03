@@ -5,3 +5,4 @@ obj/
 !include/stb_image.h
 !include/stb_image_resize.h
 !include/stamps.h
+!include/ansi.h
