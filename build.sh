@@ -39,9 +39,9 @@ do
   echo "<!> Building $file ..."
   if [[ $1 == "release" ]]
   then
-    gcc -c -Wall -march=native -O2 -g0 -lm $file
+    gcc -c -Wall -fopenmp -march=native -O3 -g0 -lm $file
   else
-    gcc -c -Wall -march=native -Og -g -lm $file
+    gcc -c -Wall -fopenmp -march=native -Og -g -lm $file
   fi
 done
 
@@ -51,9 +51,9 @@ echo "<-> Compiling executable"
 
 if [[ $1 == "release" ]]
 then
-  gcc -march=native -O2 -g0 -lm -o bin/asciimaker obj/*.o
+  gcc -march=native -fopenmp -O3 -g0 -lm -o bin/asciimaker obj/*.o
 else
-  gcc -march=native -Og -g -lm -o bin/asciimaker obj/*.o
+  gcc -march=native -fopenmp -Og -g -lm -o bin/asciimaker obj/*.o
 fi
 
 echo "<-> Done!"
